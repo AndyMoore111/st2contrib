@@ -74,12 +74,14 @@ Icon | Name | Description | Keywords | Author | Latest Version | Available Resou
 [![check_mk icon](https://raw.githubusercontent.com/StackStorm/st2contrib/master/packs/check_mk/icon.png)](https://github.com/StackStorm/st2contrib/tree/master/packs/check_mk) | [check_mk](https://github.com/StackStorm/st2contrib/tree/master/packs/check_mk) | st2 content pack containing Check_MK integrations |  | [codyaray](mailto:talktome@codyaray.com) | 0.1.0 | [click](https://github.com/StackStorm/st2contrib#check_mk-pack)
 [![chef icon](https://raw.githubusercontent.com/StackStorm/st2contrib/master/packs/chef/icon.png)](https://github.com/StackStorm/st2contrib/tree/master/packs/chef) | [chef](https://github.com/StackStorm/st2contrib/tree/master/packs/chef) | st2 chef integration pack | chef, chef-client, chef-solo, chef-apply, cfg management, configuration management, opscode | [st2-dev](mailto:info@stackstorm.com) | 0.1.1 | [click](https://github.com/StackStorm/st2contrib#chef-pack)
 [![Circle CI icon](https://raw.githubusercontent.com/StackStorm/st2contrib/master/packs/circle_ci/icon.png)](https://github.com/StackStorm/st2contrib/tree/master/packs/Circle CI) | [Circle CI](https://github.com/StackStorm/st2contrib/tree/master/packs/Circle CI) | Pack which allows integration with Circle CI. | circle, circle ci, continous integration, ci | [StackStorm dev](mailto:support@stackstorm.com) | 0.2.0 | [click](https://github.com/StackStorm/st2contrib#Circle CI-pack)
-[![cloudflare icon](https://raw.githubusercontent.com/StackStorm/st2contrib/master/packs/cloudflare/icon.png)](https://github.com/StackStorm/st2contrib/tree/master/packs/cloudflare) | [cloudflare](https://github.com/StackStorm/st2contrib/tree/master/packs/cloudflare) | A pack to interact with the Cloudflare service. | cloudflare | [Jon Middleton](mailto:jon.middleton@pulsant.com) | 0.3 | [click](https://github.com/StackStorm/st2contrib#cloudflare-pack)
+[![cisco_spark icon](https://raw.githubusercontent.com/StackStorm/st2contrib/master/packs/cisco_spark/icon.png)](https://github.com/StackStorm/st2contrib/tree/master/packs/cisco_spark) | [cisco_spark](https://github.com/StackStorm/st2contrib/tree/master/packs/cisco_spark) | cisco spark communication pack | cisco, spark, video, chat | [Anthony Shaw](mailto:anthonyshaw@apache.org) | 0.1.0 | [click](https://github.com/StackStorm/st2contrib#cisco_spark-pack)
+[![cloudflare icon](https://raw.githubusercontent.com/StackStorm/st2contrib/master/packs/cloudflare/icon.png)](https://github.com/StackStorm/st2contrib/tree/master/packs/cloudflare) | [cloudflare](https://github.com/StackStorm/st2contrib/tree/master/packs/cloudflare) | A pack to interact with the Cloudflare service. | cloudflare | [Jon Middleton](mailto:jon.middleton@pulsant.com) | 0.3.1 | [click](https://github.com/StackStorm/st2contrib#cloudflare-pack)
 [![config_demo icon](https://raw.githubusercontent.com/StackStorm/st2contrib/master/packs/st2/icon.png)](https://github.com/StackStorm/st2contrib/tree/master/packs/config_demo) | [config_demo](https://github.com/StackStorm/st2contrib/tree/master/packs/config_demo) | Pack which demonstrated new pack configuration functionality available in StackStorm v1.5 and above. |  | [st2-dev](mailto:info@stackstorm.com) | 0.1 | [click](https://github.com/StackStorm/st2contrib#config_demo-pack)
 [![consul icon](https://raw.githubusercontent.com/StackStorm/st2contrib/master/packs/consul/icon.png)](https://github.com/StackStorm/st2contrib/tree/master/packs/consul) | [consul](https://github.com/StackStorm/st2contrib/tree/master/packs/consul) | consul |  | [jfryman](mailto:james@fryman.io) | 0.0.1 | [click](https://github.com/StackStorm/st2contrib#consul-pack)
 [![csv icon](https://raw.githubusercontent.com/StackStorm/st2contrib/master/packs/csv/icon.png)](https://github.com/StackStorm/st2contrib/tree/master/packs/csv) | [csv](https://github.com/StackStorm/st2contrib/tree/master/packs/csv) | st2 content pack containing CSV integrations | csv, serialization, deserialization, text processing | [st2-dev](mailto:info@stackstorm.com) | 0.2 | [click](https://github.com/StackStorm/st2contrib#csv-pack)
 [![cubesensors icon](https://raw.githubusercontent.com/StackStorm/st2contrib/master/packs/cubesensors/icon.png)](https://github.com/StackStorm/st2contrib/tree/master/packs/cubesensors) | [cubesensors](https://github.com/StackStorm/st2contrib/tree/master/packs/cubesensors) | st2 content pack containing CubeSensors integrations | cubesensors, iot, smart home, sensors, probes, home automation | [st2-dev](mailto:info@stackstorm.com) | 0.1 | [click](https://github.com/StackStorm/st2contrib#cubesensors-pack)
-[![datadog icon](https://raw.githubusercontent.com/StackStorm/st2contrib/master/packs/datadog/icon.png)](https://github.com/StackStorm/st2contrib/tree/master/packs/datadog) | [datadog](https://github.com/StackStorm/st2contrib/tree/master/packs/datadog) | datadog | monitoring, alerting, saas | [Lisa Bekdache](mailto:lisa.bekdache@dailymotion.com) | 0.0.1 | [click](https://github.com/StackStorm/st2contrib#datadog-pack)
+[![datadog icon](https://raw.githubusercontent.com/StackStorm/st2contrib/master/packs/datadog/icon.png)](https://github.com/StackStorm/st2contrib/tree/master/packs/datadog) | [datadog](https://github.com/StackStorm/st2contrib/tree/master/packs/datadog) | datadog | monitoring, alerting, saas | [Lisa Bekdache](mailto:lisa.bekdache@dailymotion.com) | 0.0.2 | [click](https://github.com/StackStorm/st2contrib#datadog-pack)
+[![device42 icon](https://raw.githubusercontent.com/StackStorm/st2contrib/master/packs/device42/icon.png)](https://github.com/StackStorm/st2contrib/tree/master/packs/device42) | [device42](https://github.com/StackStorm/st2contrib/tree/master/packs/device42) | Device42 Actions for StackStorm |  | [Device42 Inc.](mailto:support@device42.com) | 0.1.0 | [click](https://github.com/StackStorm/st2contrib#device42-pack)
 [![Digital Ocean icon](https://raw.githubusercontent.com/StackStorm/st2contrib/master/packs/digitalocean/icon.png)](https://github.com/StackStorm/st2contrib/tree/master/packs/Digital Ocean) | [Digital Ocean](https://github.com/StackStorm/st2contrib/tree/master/packs/Digital Ocean) | st2 content pack containing Digital Ocean integration. |  | [st2-dev](mailto:info@stackstorm.com) | 0.1 | [click](https://github.com/StackStorm/st2contrib#Digital Ocean-pack)
 [![dimensiondata icon](https://raw.githubusercontent.com/StackStorm/st2contrib/master/packs/dimensiondata/icon.png)](https://github.com/StackStorm/st2contrib/tree/master/packs/dimensiondata) | [dimensiondata](https://github.com/StackStorm/st2contrib/tree/master/packs/dimensiondata) | st2 content pack containing Dimension Data Cloud integrations | cloud, load balancers, dimension data | [Anthony Shaw](mailto:anthony.shaw@dimensiondata.com) | 0.1 | [click](https://github.com/StackStorm/st2contrib#dimensiondata-pack)
 [![docker icon](https://raw.githubusercontent.com/StackStorm/st2contrib/master/packs/docker/icon.png)](https://github.com/StackStorm/st2contrib/tree/master/packs/docker) | [docker](https://github.com/StackStorm/st2contrib/tree/master/packs/docker) | st2 content pack containing docker integrations | docker, containers, virtualization, cgroups | [st2-dev](mailto:info@stackstorm.com) | 0.1 | [click](https://github.com/StackStorm/st2contrib#docker-pack)
@@ -147,6 +149,7 @@ Icon | Name | Description | Keywords | Author | Latest Version | Available Resou
 [![twitter icon](https://raw.githubusercontent.com/StackStorm/st2contrib/master/packs/twitter/icon.png)](https://github.com/StackStorm/st2contrib/tree/master/packs/twitter) | [twitter](https://github.com/StackStorm/st2contrib/tree/master/packs/twitter) | st2 content pack containing twitter integrations | twitter, social media, social networks | [st2-dev](mailto:info@stackstorm.com) | 0.1 | [click](https://github.com/StackStorm/st2contrib#twitter-pack)
 [![typeform icon](https://raw.githubusercontent.com/StackStorm/st2contrib/master/packs/typeform/icon.png)](https://github.com/StackStorm/st2contrib/tree/master/packs/typeform) | [typeform](https://github.com/StackStorm/st2contrib/tree/master/packs/typeform) | Typeform service integration pack |  | [st2-dev](mailto:info@stackstorm.com) | 0.2 | [click](https://github.com/StackStorm/st2contrib#typeform-pack)
 [![urbandict icon](https://raw.githubusercontent.com/StackStorm/st2contrib/master/packs/urbandict/icon.png)](https://github.com/StackStorm/st2contrib/tree/master/packs/urbandict) | [urbandict](https://github.com/StackStorm/st2contrib/tree/master/packs/urbandict) | st2 content pack containing urban dictionary integrations | urban dict, urban dictionary, puns | [st2-dev](mailto:info@stackstorm.com) | 0.1 | [click](https://github.com/StackStorm/st2contrib#urbandict-pack)
+[![vadc icon](https://raw.githubusercontent.com/StackStorm/st2contrib/master/packs/vadc/icon.png)](https://github.com/StackStorm/st2contrib/tree/master/packs/vadc) | [vadc](https://github.com/StackStorm/st2contrib/tree/master/packs/vadc) | Brocade vADC actions | brocade, vadc, vtm, bsd, loadbalancer | [mbodding](mailto:mbodding@brocade.com) | 0.1 | [click](https://github.com/StackStorm/st2contrib#vadc-pack)
 [![vault icon](https://raw.githubusercontent.com/StackStorm/st2contrib/master/packs/vault/icon.png)](https://github.com/StackStorm/st2contrib/tree/master/packs/vault) | [vault](https://github.com/StackStorm/st2contrib/tree/master/packs/vault) | vault |  | [steve.neuharth](mailto:steve.neuharth@target.com) | 0.0.1 | [click](https://github.com/StackStorm/st2contrib#vault-pack)
 [![vdx icon](https://raw.githubusercontent.com/StackStorm/st2contrib/master/packs/vdx/icon.png)](https://github.com/StackStorm/st2contrib/tree/master/packs/vdx) | [vdx](https://github.com/StackStorm/st2contrib/tree/master/packs/vdx) | Brocade VDX integration pack. |  | [st2-dev](mailto:info@stackstorm.com) | 0.0.1 | [click](https://github.com/StackStorm/st2contrib#vdx-pack)
 [![victorops icon](https://raw.githubusercontent.com/StackStorm/st2contrib/master/packs/victorops/icon.png)](https://github.com/StackStorm/st2contrib/tree/master/packs/victorops) | [victorops](https://github.com/StackStorm/st2contrib/tree/master/packs/victorops) | Packs which allows integration with Victorops events. | victorps integration, open, ack and resolve incidents | [Aamir](mailto:raza.aamir01@gmail.com) | 0.1.0 | [click](https://github.com/StackStorm/st2contrib#victorops-pack)
@@ -1095,6 +1098,34 @@ retry_build | Retry build for project.
 run_build | Run build for project and branch.
 wait_until_build_finishes | Wait until build finishes.
 
+### cisco_spark pack
+
+![cisco_spark icon](https://raw.githubusercontent.com/StackStorm/st2contrib/master/packs/cisco_spark/icon.png)
+
+#### Actions
+
+Name | Description
+---- | -----------
+create_room | Create a new room
+create_team | Create a new team
+create_webhook | Create a new webhook
+delete_message | Delete a message
+delete_room | Delete a room
+delete_team | Delete a team
+delete_webhook | Delete a webhook
+get_message | Get a specific message
+get_room | Get a specific room
+get_team | Get a specific team
+get_webhook | Get a specific webhook
+list_messages | List messages available
+list_rooms | List rooms available
+list_teams | List teams available
+list_webhooks | List webhooks
+send_message | Send a message
+update_room | Update a room's parameters
+update_team | Update a teams's parameters
+update_webhook | Update a webhook's parameters
+
 ### cloudflare pack
 
 ![cloudflare icon](https://raw.githubusercontent.com/StackStorm/st2contrib/master/packs/cloudflare/icon.png)
@@ -1201,7 +1232,6 @@ get_user | Get informations for one your from Datadog
 mute_all_monitors | Muting will prevent all monitors from notifying through email and posts to the event stream. State changes will only be visible by checking the alert page.
 mute_host | Mute a host
 mute_monitor | Mute a monitor
-mute_monitor | Unmute a monitor
 post_check_run | Post check run
 post_event | Post events to the stream
 post_ts_points | Post time-series data that can be graphed on Datadog's dashboards
@@ -1216,10 +1246,22 @@ share_screenboard | Share an existing screenboard with a public URL
 snapshot | Take graph snapshots
 unmute_all_monitors | Disables muting all monitors
 unmute_host | Unmute a host
+unmute_monitor | Unmute a monitor
 update_host_tags | Update all tags for a host on Datadog
 update_screenboard | Update a screenboard
 update_timeboard | Update a timeboard
 update_user | Update informations for a user from Datadog
+
+### device42 pack
+
+![device42 icon](https://raw.githubusercontent.com/StackStorm/st2contrib/master/packs/device42/icon.png)
+
+#### Actions
+
+Name | Description
+---- | -----------
+device_name_list | Returns list of devices names
+suggest_next_ip | Suggest next available IP Address
 
 ### digitalocean pack
 
@@ -2705,6 +2747,50 @@ get_results | Get Typeform registration results
 Name | Description
 ---- | -----------
 get_definitions | Retrieve definitions from urbandict for the provided term.
+
+### vadc pack
+
+![vadc icon](https://raw.githubusercontent.com/StackStorm/st2contrib/master/packs/vadc/icon.png)
+
+#### Sensors
+
+Name | Description
+---- | -----------
+brcdBwSensor | Brocade SD Bandwidth Sensor
+brcdSdSensor | Brocade Service Director Sensor
+
+#### Actions
+
+Name | Description
+---- | -----------
+bsd_get_errors | Service Director - Get Service Status Errors
+bsd_get_status | Service Director - Get Service Status
+bsd_get_vtm_bandwidth | Service Director - Get vTM Bandwidth Usage
+bsd_license_vtm | Service Director - License a vTM
+bsd_list_vtms | Service Director - Retrieve list of vTMs
+bsd_set_vtm_bandwidth | Service Director - Set vTM Bandwidth Allocation
+bsd_unlicense_vtm | Service Director - UnLicense a vTM
+deploy_chain | An Action Chain to deploy a vTM service
+deploy_workflow | A Mistral Workflow to deploy a vTM service
+remediate_pool_failure | vTM - Check service and enable maintenance when all nodes are down
+undeploy_chain | An Action Chain to remove a vTM service
+vtm_add_persistence | vTM - Configure a Session Persistence Class
+vtm_add_pool | vTM - Configure a Pool
+vtm_add_server_cert | vTM - Configure a SSL Server Certifcate
+vtm_add_tip | vTM - Configure a Traffic IP Group
+vtm_add_vserver | vTM - Configure a Virtual Server
+vtm_del_persistence | vTM - Delete a Session Persistence Class
+vtm_del_pool | vTM - Delete a Pool
+vtm_del_server_cert | vTM - Delete a SSL Server Certifcate
+vtm_del_tip | vTM - Delete a Traffic IP Group
+vtm_del_vserver | vTM - Delete a Virtual Server
+vtm_disable_ssl_encryption | vTM - Disable SSL Encryption for a Pool
+vtm_disable_ssl_offload | vTM - Disable SSL Offload for a Virtual Server
+vtm_drain_nodes | vTM - Drain nodes from a Pool
+vtm_enable_ssl_encryption | vTM - Enable SSL Encryption for a Pool
+vtm_enable_ssl_offload | vTM - Enable SSL Offload for a Virtual Server
+vtm_get_pool_nodes | vTM - Get Nodes in a Pool
+vtm_maintenance_mode | vTM - Enable or Disable Maintenance on a service
 
 ### vault pack
 
