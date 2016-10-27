@@ -6,12 +6,14 @@ import json
 import time
 
 
-class Vadc:
+class Vadc(object):
 
     DEBUG = False
 
     def __init__(self, host, user, passwd, logger):
         requests.packages.urllib3.disable_warnings()
+        if host.endswith('/') == False:
+            host += "/"
         self.host = host
         self.user = user
         self.passwd = passwd
@@ -22,6 +24,16 @@ class Vadc:
     def _debug(self, message):
         if Vadc.DEBUG:
             self.logger.debug(message)
+
+    def _get_api_version(self, apiRoot):
+        url = self.host + apiRoot
+        res = self._getConfig(url)
+        if res.status_code != 200:
+            raise Exception("Failed to locate API: {}, {}".format(res.status_code, res.text))
+        versions = res.json()
+        versions = versions["children"]
+        version = max([ver["name"] for ver in versions])
+        return version
 
     def _initHTTP(self):
         self.client = requests.Session()
@@ -111,10 +123,27 @@ class Bsd(Vadc):
         except KeyError:
             raise ValueError("brcd_sd_host, brcd_sd_user, and brcd_sd_pass must be configured")
 
-        Vadc.__init__(self, host, user, passwd, logger)
-        if host.endswith('/') == False:
-            host += "/"
-        self.baseUrl = host + "api/tmcm/2.2"
+        super(Bsd, self).__init__(host, user, passwd, logger)
+        self.version = self._get_api_version("api/tmcm")
+        self.baseUrl = host + "api/tmcm/" + self.version
+
+    def _get_vtm_licenses(self):
+        url = self.baseUrl + "/license"
+        res = self._getConfig(url)
+        if res.status_code != 200:
+            raise Exception("Failed to get licenses: {}, {}".format(res.status_code, res.text))
+        licenses = res.json()
+        licenses = licenses["children"]
+        universal = [int(lic["name"][11:]) for lic in licenses
+            if lic["name"].startswith("universal_v")]
+        universal.sort(reverse=True)
+        legacy = [float(lic["name"][7:]) for lic in licenses
+            if lic["name"].startswith("legacy_")]
+        legacy.sort(reverse=True)
+        order = []
+        order += (["universal_v" + str(ver) for ver in universal])
+        order += (["legacy_" + str(ver) for ver in legacy])
+        return order
 
     def addVtm(self, vtm, password, address, bw, fp):
         url = self.baseUrl + "/instance/?managed=false"
@@ -129,9 +158,17 @@ class Bsd(Vadc):
         if password is not None:
             config["admin_password"] = password
             config["rest_enabled"] = True
-            config["license_name"] = "universal_v3"
 
-        res = self._pushConfig(url, config, "POST")
+            # Try each of our available licenses.
+            licenses = self._get_vtm_licenses()
+            for license in licenses:
+                config["license_name"] = license
+                res = self._pushConfig(url, config, "POST")
+                if res.status_code == 201:
+                    break
+        else:
+            res = self._pushConfig(url, config, "POST")
+
         if res.status_code != 201:
             raise Exception("Failed to add vTM. Response: {}, {}".format(res.status_code, res.text))
         return res.json()
@@ -308,13 +345,17 @@ class Vtm(Vadc):
             raise ValueError("You must set key brcd_sd_proxy, and either " +
                 "brcd_sd_[host|user|pass] or brcd_vtm_[host|user|pass].")
 
-        Vadc.__init__(self, host, user, passwd, logger)
-        if host.endswith('/') == False:
-            host += "/"
+        self.bsdVersion = None
+        super(Vtm, self).__init__(host, user, passwd, logger)
         if self._proxy:
-            self.baseUrl = host + "api/tmcm/2.2/instance/{}/tm/3.8/config/active".format(vtm)
+            self.bsdVersion = self._get_api_version("api/tmcm")
+            self.version = self._get_api_version(
+                "api/tmcm/{}/instance/{}/tm".format(self.bsdVersion, vtm))
+            self.baseUrl = host + "api/tmcm/{}".format(self.bsdVersion) + \
+                "/instance/{}/tm/{}/config/active".format(vtm, self.version)
         else:
-            self.baseUrl = host + "api/tm/3.8/config/active"
+            self.version = self._get_api_version("api/tm")
+            self.baseUrl = host + "api/tm/{}/config/active".format(self.version)
 
     def _getNodeTable(self, name):
         url = self.baseUrl + "/pools/" + name
