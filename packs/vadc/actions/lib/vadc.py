@@ -8,7 +8,7 @@ import time
 
 class Vadc(object):
 
-    DEBUG = True
+    DEBUG = False
 
     def __init__(self, host, user, passwd, logger):
         requests.packages.urllib3.disable_warnings()
@@ -43,11 +43,11 @@ class Vadc(object):
         self.client = requests.Session()
         self.client.auth = (self.user, self.passwd)
 
-    def _getConfig(self, url):
+    def _getConfig(self, url, params=None):
         self._debug("URL: " + url)
         try:
             self._initHTTP()
-            response = self.client.get(url, verify=False)
+            response = self.client.get(url, verify=False, params=params)
         except:
             self.logger.error("Error: Unable to connect to API")
             raise Exception("Error: Unable to connect to API")
@@ -55,17 +55,17 @@ class Vadc(object):
         self._debug("Body: " + response.text)
         return response
 
-    def _pushConfig(self, url, config, method="PUT", ct="application/json"):
+    def _pushConfig(self, url, config, method="PUT", ct="application/json", params=None):
         self._debug("URL: " + url)
         try:
             self._initHTTP()
             config = json.dumps(config)
             if method == "PUT":
                 response = self.client.put(url, verify=False, data=config,
-                    headers={"Content-Type": ct})
+                    headers={"Content-Type": ct}, params=params)
             else:
                 response = self.client.post(url, verify=False, data=config,
-                    headers={"Content-Type": ct})
+                    headers={"Content-Type": ct}, params=params)
         except requests.exceptions.ConnectionError:
             self.logger.error("Error: Unable to connect to API")
             raise Exception("Error: Unable to connect to API")
@@ -362,7 +362,7 @@ class Vtm(Vadc):
             self.version = self._get_api_version("api/tm")
             self.baseUrl = host + "api/tm/{}".format(self.version)
         self.configUrl = self.baseUrl + "/config/active"
-        self.statusUrl = self.baseUrl + "/status/{}".format(vtm)
+        self.statusUrl = self.baseUrl + "/status/local_tm"
 
     def _getNodeTable(self, name):
         url = self.configUrl + "/pools/" + name
@@ -592,12 +592,24 @@ class Vtm(Vadc):
                 " Result: {}, {}".format(res.status_code, res.text))
 
     def restore_backup(self, name):
+        if self._proxy and self.bsdVersion < 2.4:
+            raise Exception("Backup restoration requires BSD Version 2.6 when proxying.")
         if self.version < 3.9:
             raise Exception("Backups require vTM 11.0 or newer")
-        url = self.statusUrl + "/backups/full/" + name + "?restore"
+        url = self.statusUrl + "/backups/full/" + name +"?restore"
         config = {"properties": {}}
         res = self._pushConfig(url, config)
         if res.status_code != 200:
             raise Exception("Failed to create Backup." +
                 " Result: {}, {}".format(res.status_code, res.text))
         return res.json()
+
+    def delete_backup(self, name):
+        if self.version < 3.9:
+            raise Exception("Backups require vTM 11.0 or newer")
+        url = self.statusUrl + "/backups/full/" + name
+        res = self._delConfig(url)
+        if res.status_code != 204:
+            raise Exception("Failed to delete Backup." +
+                " Result: {}, {}".format(res.status_code, res.text))
+
