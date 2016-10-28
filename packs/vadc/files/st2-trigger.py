@@ -1,19 +1,25 @@
 #!/usr/bin/python
 
 import requests
-import sys 
+import sys
 import json
 
-class VtmTrigger(object):
-
-    def __init__(self, trigger=None):
-        super(VtmTrigger, self).__init__()
-
 def main():
-    trigger = VtmTrigger()
 
-    event = sys.argv[1][len("--eventtype="):]
-    details = sys.argv[2].split("\t", 3)
+    apiHook = apiKey = None
+    for arg in sys.argv:
+        if arg.startswith("--eventtype="):
+            event = arg[len("--eventtype="):]
+        elif arg.startswith("--api-key="):
+            apiKey = arg[len("--api-key="):]
+        elif arg.startswith("--api-hook="):
+            apiHook = arg[len("--api-hook="):]
+        else:
+            details = arg.split("\t", 3)
+
+    if apiHook is None or apiKey is None:
+        sys.stderr.write("You must provide --api-key and --api-hook arguments")
+        sys.exit(1)
 
     level = details[0]
     config = details[1] if len(details) >= 2 else ""
@@ -24,13 +30,20 @@ def main():
 
     if "/" in trigger:
         payload["additional"] = trigger
-        trigger, message = message.split("\t", 1)
+        extra = message.split("\t", 1)
+        if len(extra) == 2:
+            trigger = extra[0]
+            message = extra[1]
 
     payload["trigger"] = trigger
     payload["message"] = message
 
-    print payload
+    print "St2 Payload: {}".format(payload)
+
+    uri="https://stackstorm/api/v1/webhooks/vadc_hook"
+    headers = { "St2-Api-Key": apiKey, "Content-Type": "application/json" }
+    res = requests.post(apiHook, headers=headers, data=json.dumps(payload), verify=False)
+    print "(St2 Response: {}: {}".format(res.status_code, res.text)
 
 if __name__ == "__main__":
     main()
-
