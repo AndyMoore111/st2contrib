@@ -227,6 +227,22 @@ class Bsd(Vadc):
         else:
             return output
 
+    def _submit_backup_task(self, vtm=None, cluster_id=None, tag=None):
+        if self.version < 2.3:
+            raise Exception("You need to be running BSD version 2.5 or newer to perform a backup")
+        url = self.baseUrl + "/config/backup/task"
+        if cluster_id is None:
+            if vtm is None:
+                raise Exception("You need to provide with a vTM or Cluster-ID")
+            cluster_id = self._get_cluster_for_vtm(cluster)
+        config = { "cluster_id": cluster_id, "task_type": "backup restore",
+            "task_subtype": "backup now" }
+        res = self._pushConfig(url, config, "POST")
+        if res.status_code != 201:
+            raise Exception("Failed to create BackUp, Response: {}, {}".format(
+                res.status_code, res.text))
+        return res.json()
+
     def getStatus(self, vtm=None, stringify=False):
         instances = self._cacheLookup("getStatus")
         if instances is None:
