@@ -4,6 +4,7 @@ import requests
 import sys
 import json
 import time
+from os import path
 
 
 class Vadc(object):
@@ -59,7 +60,8 @@ class Vadc(object):
         self._debug("URL: " + url)
         try:
             self._initHTTP()
-            config = json.dumps(config)
+            if ct == "application/json":
+                config = json.dumps(config)
             if method == "PUT":
                 response = self.client.put(url, verify=False, data=config,
                     headers={"Content-Type": ct}, params=params)
@@ -88,6 +90,16 @@ class Vadc(object):
         self._debug("Body: " + response.text)
         return response
 
+    def _upload_raw_binary(self, url, filename):
+        if path.isfile(filename) is False:
+            raise Exception("File: {} does not exist".format(filename))
+        if path.getsize(filename) > 20480000:
+            raise Exception("File: {} is too large.".format(filename))
+        handle = open(filename, "rb")
+        body = handle.read()
+        handle.close()
+        return self._pushConfig(url, body, ct="application/octet-stream")
+        
     def _dictify(self, listing, keyName):
         dictionary = {}
         for item in listing:
@@ -627,5 +639,45 @@ class Vtm(Vadc):
         res = self._delConfig(url)
         if res.status_code != 204:
             raise Exception("Failed to delete Backup." +
+                " Result: {}, {}".format(res.status_code, res.text))
+
+    def upload_action_program(self, name, filename):
+        url = self.configUrl + "/action_programs/" + name
+        res = self._upload_raw_binary(url, filename)
+        if res.status_code != 201 and res.status_code != 204:
+            raise Exception("Failed to upload program." +
+                " Result: {}, {}".format(res.status_code, res.text))
+
+    def add_action_program(self, name, program, arguments):
+        config = {"properties": {"basic": {"type": "program"}, "program": {"arguments": arguments, "program": program}}}
+        url = self.configUrl + "/actions/" + name
+        res = self._pushConfig(url, config)
+        if res.status_code != 200 and res.status_code != 201:
+            raise Exception("Failed to add action." +
+                " Result: {}, {}".format(res.status_code, res.text))
+
+    def get_event_type(self, name):
+        url = self.configUrl + "/event_types/" + name
+        res = self._getConfig(url)
+        if res.status_code == 404:
+            return None
+        elif res.status_code != 200:
+            raise Exception("Failed to get event." +
+                " Result: {}, {}".format(res.status_code, res.text))
+        return res.json()
+
+    def add_event_type_action(self, event, action):
+        url = self.configUrl + "/event_types/" + event
+        config = self.get_event_type(event)
+        if config is None:
+            return False
+        entries = config["properties"]["basic"]["actions"]
+        if action in entries:
+            return True
+        entries.append(action)
+        res = self._pushConfig(url, config)
+        if res.status_code != 200:
+            raise Exception("Failed to Set Action: {}".format(action) +
+                " for Event: {}.".format(event) +
                 " Result: {}, {}".format(res.status_code, res.text))
 

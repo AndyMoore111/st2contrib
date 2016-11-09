@@ -1,7 +1,7 @@
 ---
 name: "webhook"
 pack: "vadc"
-description: "vADC Web Hook"
+description: "Example vADC Web Hook Rule."
 enabled: false
 
 trigger:
@@ -12,4 +12,4 @@ trigger:
 action:
     ref: "core.local"
     parameters:
-        cmd: "logger {{trigger.headers}} && logger {{trigger.body}}"
+        cmd: "logger {{trigger.body}}"
