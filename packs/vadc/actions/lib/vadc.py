@@ -460,6 +460,20 @@ class Vtm(Vadc):
 
         return nodes
 
+    def set_pool_nodes(self, name, active, draining, disabled):
+        url = self.configUrl + "/pools/" + name
+        nodeTable = []
+        if active is not None:
+            nodeTable.extend( [{"node": node, "state": "active"} for node in active] )
+        if draining is not None:
+            nodeTable.extend( [{"node": node, "state": "draining"} for node in draining] )
+        if disabled is not None:
+            nodeTable.extend( [{"node": node, "state": "disabled"} for node in disabled] )
+        config = {"properties": {"basic": {"nodes_table": nodeTable}}}
+        res = self._pushConfig(url, config)
+        if res.status_code != 201 and res.status_code != 200:
+            raise Exception("Failed to set pool nodes. Result: {}, {}".format(res.status_code, res.text))
+
     def drainNodes(self, name, nodes, drain=True):
         url = self.configUrl + "/pools/" + name
         nodeTable = self._getNodeTable(name)
