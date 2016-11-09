@@ -18,3 +18,4 @@ class VtmAddWebhookAction(Action):
         vtm.add_action_program(name, "st2-trigger.py", arguments)
         if event is not None:
             vtm.add_event_type_action(event, name)
+        return (True, None)

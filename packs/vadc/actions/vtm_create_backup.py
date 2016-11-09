@@ -10,3 +10,4 @@ class VtmCreateBackup(Action):
 
         vtm = Vtm(self.config, self.logger, vtm)
         vtm.create_backup(name, description)
+        return (True, None)

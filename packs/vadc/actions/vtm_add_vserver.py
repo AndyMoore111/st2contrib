@@ -9,4 +9,4 @@ class VtmAddVserver(Action):
     def run(self, vtm, name, pool, tip, port, protocol):
 
         vtm = Vtm(self.config, self.logger, vtm)
-        vtm.addVserver(name, pool, tip, port, protocol)
+        vtm.add_vserver(name, pool, tip, port, protocol)

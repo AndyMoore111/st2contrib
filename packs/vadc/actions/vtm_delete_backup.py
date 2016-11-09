@@ -10,3 +10,4 @@ class VtmDeleteBackup(Action):
 
         vtm = Vtm(self.config, self.logger, vtm)
         vtm.delete_backup(name)
+        return (True, None)

@@ -10,4 +10,4 @@ class VtmListBackups(Action):
 
         vtm = Vtm(self.config, self.logger, vtm)
         backups = vtm.list_backups()
-        return backups
+        return (True, backups)

@@ -28,7 +28,7 @@ class Vadc(object):
 
     def _get_api_version(self, apiRoot):
         url = self.host + apiRoot
-        res = self._getConfig(url)
+        res = self._get_config(url)
         if res.status_code != 200:
             raise Exception("Failed to locate API: {}, {}".format(res.status_code, res.text))
         versions = res.json()
@@ -40,14 +40,14 @@ class Vadc(object):
         self._debug("API Version: {}".format(version))
         return version
 
-    def _initHTTP(self):
+    def _init_http(self):
         self.client = requests.Session()
         self.client.auth = (self.user, self.passwd)
 
-    def _getConfig(self, url, params=None):
+    def _get_config(self, url, params=None):
         self._debug("URL: " + url)
         try:
-            self._initHTTP()
+            self._init_http()
             response = self.client.get(url, verify=False, params=params)
         except:
             self.logger.error("Error: Unable to connect to API")
@@ -56,10 +56,10 @@ class Vadc(object):
         self._debug("Body: " + response.text)
         return response
 
-    def _pushConfig(self, url, config, method="PUT", ct="application/json", params=None):
+    def _push_config(self, url, config, method="PUT", ct="application/json", params=None):
         self._debug("URL: " + url)
         try:
-            self._initHTTP()
+            self._init_http()
             if ct == "application/json":
                 config = json.dumps(config)
             if method == "PUT":
@@ -77,10 +77,10 @@ class Vadc(object):
         self._debug("Body: " + response.text)
         return response
 
-    def _delConfig(self, url):
+    def _del_config(self, url):
         self._debug("URL: " + url)
         try:
-            self._initHTTP()
+            self._init_http()
             response = self.client.delete(url, verify=False)
         except requests.exceptions.ConnectionError:
             sys.stderr.write("Error: Unable to connect to API {}".format(url))
@@ -98,7 +98,7 @@ class Vadc(object):
         handle = open(filename, "rb")
         body = handle.read()
         handle.close()
-        return self._pushConfig(url, body, ct="application/octet-stream")
+        return self._push_config(url, body, ct="application/octet-stream")
         
     def _dictify(self, listing, keyName):
         dictionary = {}
@@ -106,12 +106,12 @@ class Vadc(object):
             k = item.pop(keyName)
             dictionary[k] = item
 
-    def _cacheStore(self, key, data, timeout=10):
+    def _cache_store(self, key, data, timeout=10):
         exp = time.time() + timeout
         self._debug("Cache Store: {}".format(key))
         self._cache[key] = {"exp": exp, "data": data}
 
-    def _cacheLookup(self, key):
+    def _cache_lookup(self, key):
         now = time.time()
         if key in self._cache:
             entry = self._cache[key]
@@ -121,10 +121,10 @@ class Vadc(object):
         self._debug("Cache Miss: {}".format(key))
         return None
 
-    def dumpCache(self):
+    def dump_cache(self):
         return json.dumps(self._cache, encoding="utf-8")
 
-    def loadCache(self, cache):
+    def load_cache(self, cache):
         self._cache = json.loads(cache, encoding="utf-8")
 
 
@@ -145,7 +145,7 @@ class Bsd(Vadc):
 
     def _get_vtm_licenses(self):
         url = self.baseUrl + "/license"
-        res = self._getConfig(url)
+        res = self._get_config(url)
         if res.status_code != 200:
             raise Exception("Failed to get licenses: {}, {}".format(res.status_code, res.text))
         licenses = res.json()
@@ -161,7 +161,7 @@ class Bsd(Vadc):
         order += (["legacy_" + str(ver) for ver in legacy])
         return order
 
-    def addVtm(self, vtm, password, address, bw, fp):
+    def add_vtm(self, vtm, password, address, bw, fp):
         url = self.baseUrl + "/instance/?managed=false"
 
         if address is None:
@@ -179,50 +179,50 @@ class Bsd(Vadc):
             licenses = self._get_vtm_licenses()
             for license in licenses:
                 config["license_name"] = license
-                res = self._pushConfig(url, config, "POST")
+                res = self._push_config(url, config, "POST")
                 if res.status_code == 201:
                     break
         else:
-            res = self._pushConfig(url, config, "POST")
+            res = self._push_config(url, config, "POST")
 
         if res.status_code != 201:
             raise Exception("Failed to add vTM. Response: {}, {}".format(res.status_code, res.text))
         return res.json()
 
-    def delVtm(self, vtm):
+    def del_vtm(self, vtm):
         url = self.baseUrl + "/instance/" + vtm
         config = {"status": "deleted"}
-        res = self._pushConfig(url, config, "POST")
+        res = self._push_config(url, config, "POST")
         if res.status_code != 200:
             raise Exception("Failed to del vTM. Response: {}, {}".format(res.status_code, res.text))
         return res.json()
 
-    def getVtm(self, tag):
-        vtm = self._cacheLookup("getVtm_" + tag)
+    def get_vtm(self, tag):
+        vtm = self._cache_lookup("get_vtm_" + tag)
         if vtm is None:
             url = self.baseUrl + "/instance/" + tag
-            res = self._getConfig(url)
+            res = self._get_config(url)
             if res.status_code != 200:
                 raise Exception("Failed to get vTM {}. Response: {}, {}".format(
                     vtm, res.status_code, res.text))
             vtm = res.json()
-            self._cacheStore("getVtm_" + tag, vtm)
+            self._cache_store("get_vtm_" + tag, vtm)
         return vtm
 
-    def listVtms(self, full, deleted, stringify):
-        instances = self._cacheLookup("listVtms")
+    def list_vtms(self, full, deleted, stringify):
+        instances = self._cache_lookup("list_vtms")
         if instances is None:
             url = self.baseUrl + "/instance/"
-            res = self._getConfig(url)
+            res = self._get_config(url)
             if res.status_code != 200:
                 raise Exception("Failed to list vTMs. Response: {}, {}".format(
                     res.status_code, res.text))
             instances = res.json()
-            self._cacheStore("listVtms", instances)
+            self._cache_store("list_vtms", instances)
 
         output = []
         for instance in instances["children"]:
-            config = self.getVtm(instance["name"])
+            config = self.get_vtm(instance["name"])
             if deleted is False and config["status"] == "Deleted":
                 continue
             if full:
@@ -249,23 +249,23 @@ class Bsd(Vadc):
             cluster_id = self._get_cluster_for_vtm(cluster)
         config = { "cluster_id": cluster_id, "task_type": "backup restore",
             "task_subtype": "backup now" }
-        res = self._pushConfig(url, config, "POST")
+        res = self._push_config(url, config, "POST")
         if res.status_code != 201:
             raise Exception("Failed to create BackUp, Response: {}, {}".format(
                 res.status_code, res.text))
         return res.json()
 
-    def getStatus(self, vtm=None, stringify=False):
-        instances = self._cacheLookup("getStatus")
+    def get_status(self, vtm=None, stringify=False):
+        instances = self._cache_lookup("get_status")
         if instances is None:
             url = self.baseUrl + "/monitoring/instance"
-            res = self._getConfig(url)
+            res = self._get_config(url)
             if res.status_code != 200:
                 raise Exception("Failed get Status. Result: {}, {}".format(
                     res.status_code, res.text))
 
             instances = res.json()
-            self._cacheStore("getStatus", instances)
+            self._cache_store("get_status", instances)
 
         if vtm is not None:
             for instance in instances:
@@ -277,8 +277,8 @@ class Bsd(Vadc):
         else:
             return instances
 
-    def getErrors(self, stringify=False):
-        instances = self.getStatus()
+    def get_errors(self, stringify=False):
+        instances = self.get_status()
         errors = {}
         for instance in instances:
             error = {}
@@ -304,17 +304,17 @@ class Bsd(Vadc):
         else:
             return errors
 
-    def getMonitorIntervals(self, setting=None):
-        intervals = self._cacheLookup("getMonitorIntervals")
+    def get_monitor_intervals(self, setting=None):
+        intervals = self._cache_lookup("get_monitor_intervals")
         if intervals is None:
             url = self.baseUrl + "/settings/monitoring"
-            res = self._getConfig(url)
+            res = self._get_config(url)
             if res.status_code != 200:
                 raise Exception("Failed to get Monitoring Intervals. Result: {}, {}".format(
                     res.status_code, res.text))
 
             intervals = res.json()
-            self._cacheStore("getMonitorIntervals", intervals)
+            self._cache_store("get_monitor_intervals", intervals)
 
         if setting is not None:
             if setting not in intervals:
@@ -322,11 +322,11 @@ class Bsd(Vadc):
             return intervals[setting]
         return intervals
 
-    def getBandwidth(self, vtm=None, stringify=False):
-        instances = self.getStatus(vtm)
+    def get_bandwidth(self, vtm=None, stringify=False):
+        instances = self.get_status(vtm)
         bandwidth = {}
         for instance in instances:
-            config = self.getVtm(instance["name"])
+            config = self.get_vtm(instance["name"])
             tag = config["tag"]
             # Bytes/Second
             if "throughput_out" in instance:
@@ -348,10 +348,10 @@ class Bsd(Vadc):
         else:
             return bandwidth
 
-    def setBandwidth(self, vtm, bw):
+    def set_bandwidth(self, vtm, bw):
         url = self.baseUrl + "/instance/" + vtm
         config = {"bandwidth": bw}
-        res = self._pushConfig(url, config)
+        res = self._push_config(url, config)
         if res.status_code != 200:
             raise Exception("Failed to set Bandwidth. Result: {}, {}".format(
                 res.status_code, res.text))
@@ -392,46 +392,45 @@ class Vtm(Vadc):
         self.configUrl = self.baseUrl + "/config/active"
         self.statusUrl = self.baseUrl + "/status/local_tm"
 
-    def _getNodeTable(self, name):
+    def _get_node_table(self, name):
         url = self.configUrl + "/pools/" + name
-        res = self._getConfig(url)
+        res = self._get_config(url)
         if res.status_code != 200:
             raise Exception("Failed to get pool. Result: {}, {}".format(res.status_code, res.text))
 
         config = res.json()
         return config["properties"]["basic"]["nodes_table"]
 
-    def _getVSConfig(self, name):
+    def _get_vs_config(self, name):
         url = self.configUrl + "/virtual_servers/" + name
-        res = self._getConfig(url)
+        res = self._get_config(url)
         if res.status_code != 200:
             raise Exception("Failed to get VS. Result: {}, {}".format(res.status_code, res.text))
 
         config = res.json()
         return config
 
-    def _setVSConfig(self, name, config):
+    def _set_vs_config(self, name, config):
         url = self.configUrl + "/virtual_servers/" + name
-        res = self._pushConfig(url, config)
+        res = self._push_config(url, config)
         if res.status_code != 200:
             raise Exception("Failed to set VS. Result: {}, {}".format(res.status_code, res.text))
-        config = res.json()
-        return config
+        return res
 
-    def _getVSRules(self, name):
-        config = self._getVSConfig(name)
+    def _get_vs_rules(self, name):
+        config = self._get_vs_config(name)
         rules = {k: config["properties"]["basic"][k] for k in
                 ("request_rules", "response_rules", "completionrules")}
         return rules
 
-    def _setVSRules(self, name, rules):
+    def _set_vs_rules(self, name, rules):
         config = {"properties": {"basic": rules}}
-        res = self._setVSConfig(name, config)
+        res = self._set_vs_config(name, config)
         if res.status_code != 200:
             raise Exception("Failed set VS Rules. Result: {}, {}".format(res.status_code, res.text))
 
-    def insertRule(self, vsname, rulename, insert=True):
-        rules = self._getVSRules(vsname)
+    def insert_rule(self, vsname, rulename, insert=True):
+        rules = self._get_vs_rules(vsname)
         if insert:
             if rulename in rules["request_rules"]:
                 raise Exception("VServer {} already in maintenance".format(vsname))
@@ -440,13 +439,13 @@ class Vtm(Vadc):
             if rulename not in rules["request_rules"]:
                 raise Exception("VServer {} is not in maintenance".format(vsname))
             rules["request_rules"].remove(rulename)
-        self._setVSRules(vsname, rules)
+        self._set_vs_rules(vsname, rules)
 
-    def enableMaintenance(self, vsname, rulename="maintenance", enable=True):
-        self.insertRule(vsname, rulename, enable)
+    def enable_maintenance(self, vsname, rulename="maintenance", enable=True):
+        self.insert_rule(vsname, rulename, enable)
 
-    def getPoolNodes(self, name):
-        nodeTable = self._getNodeTable(name)
+    def get_pool_nodes(self, name):
+        nodeTable = self._get_node_table(name)
         nodes = {"active": [], "disabled": [], "draining": []}
         for node in nodeTable:
             if node["state"] == "active":
@@ -470,13 +469,13 @@ class Vtm(Vadc):
         if disabled is not None:
             nodeTable.extend( [{"node": node, "state": "disabled"} for node in disabled] )
         config = {"properties": {"basic": {"nodes_table": nodeTable}}}
-        res = self._pushConfig(url, config)
+        res = self._push_config(url, config)
         if res.status_code != 201 and res.status_code != 200:
             raise Exception("Failed to set pool nodes. Result: {}, {}".format(res.status_code, res.text))
 
-    def drainNodes(self, name, nodes, drain=True):
+    def drain_nodes(self, name, nodes, drain=True):
         url = self.configUrl + "/pools/" + name
-        nodeTable = self._getNodeTable(name)
+        nodeTable = self._get_node_table(name)
         for entry in nodeTable:
             if entry["node"] in nodes:
                 if drain:
@@ -485,11 +484,11 @@ class Vtm(Vadc):
                     entry["state"] = "active"
 
         config = {"properties": {"basic": {"nodes_table": nodeTable}}}
-        res = self._pushConfig(url, config)
+        res = self._push_config(url, config)
         if res.status_code != 201 and res.status_code != 200:
             raise Exception("Failed to add pool. Result: {}, {}".format(res.status_code, res.text))
 
-    def addPool(self, name, nodes, algorithm, persistence, monitors):
+    def add_pool(self, name, nodes, algorithm, persistence, monitors):
         url = self.configUrl + "/pools/" + name
 
         nodeTable = []
@@ -499,48 +498,48 @@ class Vtm(Vadc):
         config = {"properties": {"basic": {"nodes_table": nodeTable, "monitors": monitors,
             "persistence_class": persistence}, "load_balancing": {"algorithm": algorithm}}}
 
-        res = self._pushConfig(url, config)
+        res = self._push_config(url, config)
         if res.status_code != 201 and res.status_code != 200:
             raise Exception("Failed to add pool. Result: {}, {}".format(res.status_code, res.text))
 
-    def delPool(self, name):
+    def del_pool(self, name):
         url = self.configUrl + "/pools/" + name
-        res = self._delConfig(url)
+        res = self._del_config(url)
         if res.status_code != 204:
             raise Exception("Failed to del pool. Result: {}, {}".format(res.status_code, res.text))
 
-    def addVserver(self, name, pool, tip, port, protocol):
+    def add_vserver(self, name, pool, tip, port, protocol):
         url = self.configUrl + "/virtual_servers/" + name
         config = {"properties": {"basic": {"pool": pool, "port": port, "protocol": protocol,
             "listen_on_any": False, "listen_on_traffic_ips": [tip], "enabled": True}}}
 
-        res = self._pushConfig(url, config)
+        res = self._push_config(url, config)
         if res.status_code != 201 and res.status_code != 200:
             raise Exception("Failed to add VS. Result: {}, {}".format(res.status_code, res.text))
 
-    def delVserver(self, name):
+    def del_vserver(self, name):
         url = self.configUrl + "/virtual_servers/" + name
-        res = self._delConfig(url)
+        res = self._del_config(url)
         if res.status_code != 204:
             raise Exception("Failed to del VS. Result: {}, {}".format(res.status_code, res.text))
 
-    def addTip(self, name, vtms, addresses):
+    def add_tip(self, name, vtms, addresses):
         url = self.configUrl + "/traffic_ip_groups/" + name
 
         config = {"properties": {"basic": {"ipaddresses": addresses,
             "machines": vtms, "enabled": True}}}
 
-        res = self._pushConfig(url, config)
+        res = self._push_config(url, config)
         if res.status_code != 201 and res.status_code != 200:
             raise Exception("Failed to add TIP. Result: {}, {}".format(res.status_code, res.text))
 
-    def delTip(self, name):
+    def del_tip(self, name):
         url = self.configUrl + "/traffic_ip_groups/" + name
-        res = self._delConfig(url)
+        res = self._del_config(url)
         if res.status_code != 204:
             raise Exception("Failed to del TIP. Result: {}, {}".format(res.status_code, res.text))
 
-    def addServerCert(self, name, public, private):
+    def add_server_cert(self, name, public, private):
         url = self.configUrl + "/ssl/server_keys/" + name
 
         public = public.replace("\\n", "\n")
@@ -548,38 +547,38 @@ class Vtm(Vadc):
 
         config = {"properties": {"basic": {"public": public, "private": private}}}
 
-        res = self._pushConfig(url, config)
+        res = self._push_config(url, config)
         if res.status_code != 201 and res.status_code != 200:
             raise Exception("Failed to add Server Certificate." +
                 " Result: {}, {}".format(res.status_code, res.text))
 
-    def delServerCert(self, name):
+    def del_server_cert(self, name):
         url = self.configUrl + "/ssl/server_keys/" + name
-        res = self._delConfig(url)
+        res = self._del_config(url)
         if res.status_code != 204:
             raise Exception("Failed to delete Server Certificate." +
                 " Result: {}, {}".format(res.status_code, res.text))
 
-    def enableSSLOffload(self, name, cert="", on=True, xproto=False, headers=False):
+    def enable_ssl_offload(self, name, cert="", on=True, xproto=False, headers=False):
         url = self.configUrl + "/virtual_servers/" + name
         config = {"properties": {"basic": {"ssl_decrypt": on, "add_x_forwarded_proto": xproto},
             "ssl": {"add_http_headers": headers, "server_cert_default": cert}}}
 
-        res = self._pushConfig(url, config)
+        res = self._push_config(url, config)
         if res.status_code != 200:
             raise Exception("Failed to configure SSl Offload on {}.".format(name) +
                 " Result: {}, {}".format(res.status_code, res.text))
 
-    def enableSSLEncryption(self, name, on=True, verify=False):
+    def enable_ssl_encryption(self, name, on=True, verify=False):
         url = self.configUrl + "/pools/" + name
         config = {"properties": {"ssl": {"enable": on, "strict_verify": verify}}}
 
-        res = self._pushConfig(url, config)
+        res = self._push_config(url, config)
         if res.status_code != 200:
             raise Exception("Failed to configure SSl Encryption on {}.".format(name) +
                 " Result: {}, {}".format(res.status_code, res.text))
 
-    def addSessionPersistence(self, name, method, cookie=None):
+    def add_session_persistence(self, name, method, cookie=None):
         types = ["ip", "universal", "named", "transparent", "cookie", "j2ee", "asp", "ssl"]
         if method not in types:
             raise Exception("Failed to add SP Class. Invalid method: {}".format(method) +
@@ -593,14 +592,14 @@ class Vtm(Vadc):
         url = self.configUrl + "/persistence/" + name
         config = {"properties": {"basic": {"type": method, "cookie": cookie}}}
 
-        res = self._pushConfig(url, config)
+        res = self._push_config(url, config)
         if res.status_code != 201 and res.status_code != 200:
             raise Exception("Failed to add Session Persistence Class" +
                 " Result: {}, {}".format(res.status_code, res.text))
 
-    def delSessionPersistence(self, name):
+    def del_session_persistence(self, name):
         url = self.configUrl + "/persistence/" + name
-        res = self._delConfig(url)
+        res = self._del_config(url)
         if res.status_code != 204:
             raise Exception("Failed to delete Session Persistence Class." +
                 " Result: {}, {}".format(res.status_code, res.text))
@@ -609,7 +608,7 @@ class Vtm(Vadc):
         if self.version < 3.9:
             raise Exception("Backups require vTM 11.0 or newer")
         url = self.statusUrl + "/backups/full" 
-        res = self._getConfig(url)
+        res = self._get_config(url)
         if res.status_code != 200:
             raise Exception("Failed to get Backup Listing." +
                 " Result: {}, {}".format(res.status_code, res.text))
@@ -617,7 +616,7 @@ class Vtm(Vadc):
         output = {}
         for backup in [backup["name"] for backup in listing]:
             url = self.statusUrl + "/backups/full/" + backup
-            res = self._getConfig(url)
+            res = self._get_config(url)
             if res.status_code == 200:
                 out = res.json()
                 output[backup] = out["properties"]["backup"]
@@ -627,8 +626,9 @@ class Vtm(Vadc):
         if self.version < 3.9:
             raise Exception("Backups require vTM 11.0 or newer")
         url = self.statusUrl + "/backups/full/" + name
+        description="" if description is None else description
         config = {"properties": {"backup": {"description": description }}}
-        res = self._pushConfig(url, config)
+        res = self._push_config(url, config)
         if res.status_code != 201 and res.status_code != 200:
             raise Exception("Failed to create Backup." +
                 " Result: {}, {}".format(res.status_code, res.text))
@@ -640,7 +640,7 @@ class Vtm(Vadc):
             raise Exception("Backups require vTM 11.0 or newer")
         url = self.statusUrl + "/backups/full/" + name +"?restore"
         config = {"properties": {}}
-        res = self._pushConfig(url, config)
+        res = self._push_config(url, config)
         if res.status_code != 200:
             raise Exception("Failed to create Backup." +
                 " Result: {}, {}".format(res.status_code, res.text))
@@ -650,7 +650,7 @@ class Vtm(Vadc):
         if self.version < 3.9:
             raise Exception("Backups require vTM 11.0 or newer")
         url = self.statusUrl + "/backups/full/" + name
-        res = self._delConfig(url)
+        res = self._del_config(url)
         if res.status_code != 204:
             raise Exception("Failed to delete Backup." +
                 " Result: {}, {}".format(res.status_code, res.text))
@@ -665,14 +665,14 @@ class Vtm(Vadc):
     def add_action_program(self, name, program, arguments):
         config = {"properties": {"basic": {"type": "program"}, "program": {"arguments": arguments, "program": program}}}
         url = self.configUrl + "/actions/" + name
-        res = self._pushConfig(url, config)
+        res = self._push_config(url, config)
         if res.status_code != 200 and res.status_code != 201:
             raise Exception("Failed to add action." +
                 " Result: {}, {}".format(res.status_code, res.text))
 
     def get_event_type(self, name):
         url = self.configUrl + "/event_types/" + name
-        res = self._getConfig(url)
+        res = self._get_config(url)
         if res.status_code == 404:
             return None
         elif res.status_code != 200:
@@ -689,7 +689,7 @@ class Vtm(Vadc):
         if action in entries:
             return True
         entries.append(action)
-        res = self._pushConfig(url, config)
+        res = self._push_config(url, config)
         if res.status_code != 200:
             raise Exception("Failed to Set Action: {}".format(action) +
                 " for Event: {}.".format(event) +

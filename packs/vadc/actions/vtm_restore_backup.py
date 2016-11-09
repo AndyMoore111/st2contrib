@@ -10,4 +10,4 @@ class VtmRestoreBackup(Action):
 
         vtm = Vtm(self.config, self.logger, vtm)
         output = vtm.restore_backup(name)
-        return output
+        return (True, output)

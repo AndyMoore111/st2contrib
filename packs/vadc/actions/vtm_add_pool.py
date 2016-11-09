@@ -9,4 +9,4 @@ class VtmAddPool(Action):
     def run(self, vtm, name, nodes, algorithm, persistence, monitors):
 
         vtm = Vtm(self.config, self.logger, vtm)
-        vtm.addPool(name, nodes, algorithm, persistence, monitors)
+        vtm.add_pool(name, nodes, algorithm, persistence, monitors)
