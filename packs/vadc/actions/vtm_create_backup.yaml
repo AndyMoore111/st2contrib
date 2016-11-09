@@ -16,3 +16,4 @@ parameters:
     description: "An optional description of the backup"
     required: false
     type: string
+    default: "StackStorm Backup"
