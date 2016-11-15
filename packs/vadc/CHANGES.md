@@ -2,6 +2,10 @@
 
 # 0.3.0
 
+- Example vADC webhook rule included, and a python script for calling the hook
+  from the vTM Alerting framework. Script: `files/st2-trigger.py`
+  - New Action to upload webhook: `vadc.vtm_add_webhook_action`
+
 - Added support for vTMs as old as 9.3.
   - Services Director will try universal license and fall back to Legacy FLA
 
