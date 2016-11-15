@@ -9,7 +9,7 @@ from os import path
 
 class Vadc(object):
 
-    DEBUG = False
+    DEBUG = True
 
     def __init__(self, host, user, passwd, logger):
         requests.packages.urllib3.disable_warnings()
@@ -462,13 +462,15 @@ class Vtm(Vadc):
     def set_pool_nodes(self, name, active, draining, disabled):
         url = self.configUrl + "/pools/" + name
         nodeTable = []
-        if active is not None:
-            nodeTable.extend( [{"node": node, "state": "active"} for node in active] )
-        if draining is not None:
+        if active is not None and active:
+            # Workaround bug: 3011 https://github.com/StackStorm/st2/issues/3011
+            if  active[0] != '[]':
+                nodeTable.extend( [{"node": node, "state": "active"} for node in active] )
+        if draining is not None and draining:
             nodeTable.extend( [{"node": node, "state": "draining"} for node in draining] )
-        if disabled is not None:
+        if disabled is not None and disabled:
             nodeTable.extend( [{"node": node, "state": "disabled"} for node in disabled] )
-        config = {"properties": {"basic": {"nodes_table": nodeTable}}}
+        config = {"properties": {"basic": {"nodes_table": nodeTable }}}
         res = self._push_config(url, config)
         if res.status_code != 201 and res.status_code != 200:
             raise Exception("Failed to set pool nodes. Result: {}, {}".format(res.status_code, res.text))
