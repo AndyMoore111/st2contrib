@@ -56,11 +56,20 @@ class Vadc(object):
         self._debug("Body: " + response.text)
         return response
 
-    def _push_config(self, url, config, method="PUT", ct="application/json", params=None):
+    def _push_config(self, url, config, method="PUT", ct="application/json", params=None, extra=None):
         self._debug("URL: " + url)
         try:
             self._init_http()
             if ct == "application/json":
+                if extra is not None:
+                    try:
+                        if extra.startswith("{"):
+                            extra = json.loads(extra, encoding="utf-8")
+                        else:
+                            extra = yaml.load( extra )
+                        self._merge_extra(config, extra)
+                    except Exception as e:
+                        self.logger.warn("Failed to merge extra properties: {}".format(e))
                 config = json.dumps(config)
             if method == "PUT":
                 response = self.client.put(url, verify=False, data=config,
@@ -105,6 +114,13 @@ class Vadc(object):
         for item in listing:
             k = item.pop(keyName)
             dictionary[k] = item
+
+    def _merge_extra(self, obj1, obj2):
+        for section in obj2["properties"].keys():
+            if section in obj1["properties"].keys():
+                obj1["properties"][section].update(obj2["properties"][section])
+            else:
+                obj1["properties"][section] = obj2["properties"][section]
 
     def _cache_store(self, key, data, timeout=10):
         exp = time.time() + timeout
@@ -160,6 +176,26 @@ class Bsd(Vadc):
         order += (["universal_v" + str(ver) for ver in universal])
         order += (["legacy_" + str(ver) for ver in legacy])
         return order
+
+    def get_cluster_members(self, cluster):
+        url = self.baseUrl + "/cluster/" + cluster
+        res = self._get_config(url)
+        if res.status_code != 200:
+            raise Exception("Failed to locate cluster: {}, {}".format(res.status_code, res.text))
+        config = res.json()
+        return config["members"]
+
+    def get_active_vtm(self, vtms=None, cluster=None):
+        if cluster is None and vtms is None:
+            raise Exception("Error - You must supply either a list of vTMs or a Cluster ID")
+        if cluster is not None and cluster != "":
+            vtms = self.get_cluster_members(cluster)
+        for vtm in vtms:
+            url = self.baseUrl + "/instance/" + vtm + "/tm/"
+            res = self._get_config(url)
+            if res.status_code == 200:
+                return vtm
+        return None
 
     def add_vtm(self, vtm, password, address, bw, fp):
         url = self.baseUrl + "/instance/?managed=false"
@@ -490,7 +526,7 @@ class Vtm(Vadc):
         if res.status_code != 201 and res.status_code != 200:
             raise Exception("Failed to add pool. Result: {}, {}".format(res.status_code, res.text))
 
-    def add_pool(self, name, nodes, algorithm, persistence, monitors):
+    def add_pool(self, name, nodes, algorithm, persistence, monitors, extra=None):
         url = self.configUrl + "/pools/" + name
 
         nodeTable = []
@@ -500,7 +536,7 @@ class Vtm(Vadc):
         config = {"properties": {"basic": {"nodes_table": nodeTable, "monitors": monitors,
             "persistence_class": persistence}, "load_balancing": {"algorithm": algorithm}}}
 
-        res = self._push_config(url, config)
+        res = self._push_config(url, config, extra=extra)
         if res.status_code != 201 and res.status_code != 200:
             raise Exception("Failed to add pool. Result: {}, {}".format(res.status_code, res.text))
 
@@ -510,12 +546,12 @@ class Vtm(Vadc):
         if res.status_code != 204:
             raise Exception("Failed to del pool. Result: {}, {}".format(res.status_code, res.text))
 
-    def add_vserver(self, name, pool, tip, port, protocol):
+    def add_vserver(self, name, pool, tip, port, protocol, extra=None):
         url = self.configUrl + "/virtual_servers/" + name
         config = {"properties": {"basic": {"pool": pool, "port": port, "protocol": protocol,
             "listen_on_any": False, "listen_on_traffic_ips": [tip], "enabled": True}}}
 
-        res = self._push_config(url, config)
+        res = self._push_config(url, config, extra=extra)
         if res.status_code != 201 and res.status_code != 200:
             raise Exception("Failed to add VS. Result: {}, {}".format(res.status_code, res.text))
 
@@ -525,13 +561,13 @@ class Vtm(Vadc):
         if res.status_code != 204:
             raise Exception("Failed to del VS. Result: {}, {}".format(res.status_code, res.text))
 
-    def add_tip(self, name, vtms, addresses):
+    def add_tip(self, name, vtms, addresses, extra=None):
         url = self.configUrl + "/traffic_ip_groups/" + name
 
         config = {"properties": {"basic": {"ipaddresses": addresses,
             "machines": vtms, "enabled": True}}}
 
-        res = self._push_config(url, config)
+        res = self._push_config(url, config, extra=extra)
         if res.status_code != 201 and res.status_code != 200:
             raise Exception("Failed to add TIP. Result: {}, {}".format(res.status_code, res.text))
 

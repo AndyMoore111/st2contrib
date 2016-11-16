@@ -31,3 +31,7 @@ parameters:
     default: ["Ping"]
     type: array
     required: false
+  extra:
+    description: "Additional JSON/YAML properties to merge during creation"
+    type: string
+    required: false
