@@ -2,6 +2,15 @@
 
 # 0.3.0
 
+- You can now parse JSON or YAML strings in an `extra` parameter to apply
+addition configuration when creating objects. This can be used with:
+  - vtm_add_pool
+  - vtm_add_vserver
+  - vtm_add_tip
+
+- New action to locate a running vTM when provided with a list of vTMs or
+  a Cluster ID.
+
 - Example vADC webhook rule included, and a python script for calling the hook
   from the vTM Alerting framework. Script: `files/st2-trigger.py`
   - New Action to upload webhook: `vadc.vtm_add_webhook_action`
