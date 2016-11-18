@@ -2,6 +2,9 @@
 
 # 0.3.0
 
+- vtm_add_pool now only sets nodes, unless you provide the optional params
+for algorithm, monitors, and session persistence.
+
 - You can now parse JSON or YAML strings in an `extra` parameter to apply
 addition configuration when creating objects. This can be used with:
   - vtm_add_pool

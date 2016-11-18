@@ -3,13 +3,14 @@
 import requests
 import sys
 import json
+import yaml
 import time
 from os import path
 
 
 class Vadc(object):
 
-    DEBUG = True
+    DEBUG = False
 
     def __init__(self, host, user, passwd, logger):
         requests.packages.urllib3.disable_warnings()
@@ -499,9 +500,7 @@ class Vtm(Vadc):
         url = self.configUrl + "/pools/" + name
         nodeTable = []
         if active is not None and active:
-            # Workaround bug: 3011 https://github.com/StackStorm/st2/issues/3011
-            if  active[0] != '[]':
-                nodeTable.extend( [{"node": node, "state": "active"} for node in active] )
+            nodeTable.extend( [{"node": node, "state": "active"} for node in active] )
         if draining is not None and draining:
             nodeTable.extend( [{"node": node, "state": "draining"} for node in draining] )
         if disabled is not None and disabled:
@@ -533,8 +532,16 @@ class Vtm(Vadc):
         for node in nodes:
             nodeTable.append({"node": node, "state": "active"})
 
-        config = {"properties": {"basic": {"nodes_table": nodeTable, "monitors": monitors,
-            "persistence_class": persistence}, "load_balancing": {"algorithm": algorithm}}}
+        config = {"properties": {"basic": {"nodes_table": nodeTable}, "load_balancing": {}}}
+
+        if monitors is not None:
+            config["properties"]["basic"]["monitors"] = monitors
+
+        if persistence is not None:
+            config["properties"]["basic"]["persistence_class"] = persistence
+
+        if algorithm is not None:
+            config["properties"]["load_balancing"]["algorithm"] = algorithm
 
         res = self._push_config(url, config, extra=extra)
         if res.status_code != 201 and res.status_code != 200:
